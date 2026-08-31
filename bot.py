@@ -16,8 +16,17 @@ async def start(update:Update,context:ContextTypes.DEFAULT_TYPE):
     proceso.start()
     await update.message.reply_text("El proceso fue iniciado...")
 
+
+async def comando2(update:Update,context:ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text("Hola bienvenido") 
+
+async def productos(update:Update,context:ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text("Productos....")
+
 app=ApplicationBuilder().token("").build()
 app.add_handler(CommandHandler("procesar",start))
+app.add_handler(CommandHandler("start",comando2))
+app.add_handler(CommandHandler("productos",productos))
 
 print("Bot iniciado...")
 app.run_polling()
