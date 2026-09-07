@@ -5,7 +5,8 @@ from telegram import Update
 from telegram.ext import (
     ApplicationBuilder,
     CommandHandler,
-    ContextTypes
+    ContextTypes,
+    MessageHandler
 )
 
 async def imagenEnviar(update:Update,context:ContextTypes.DEFAULT_TYPE):
