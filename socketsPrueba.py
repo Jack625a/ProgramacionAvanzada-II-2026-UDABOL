@@ -1,11 +1,15 @@
 #Importar sockets
 import socket
+import threading
 
 #Paso 1. crear el servidor
-servidor=socket(socket.AF_INET,socket.SOCK_STREAM)
+servidor=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 
 #Paso 2. Definir el host y el puerto
-servidor.bind("127.0.0.1",5000)
+host="127.0.0.1"
+puerto=5000
+
+servidor.bind((host,puerto))
 #paso 3. Activar el host
 servidor.listen(1)
 
@@ -13,11 +17,32 @@ servidor.listen(1)
 conexion,direccion=servidor.accept()
 print(f"Cliente conectado: {direccion}")
 
-mensaje=conexion.recv(1024)
+#Funcion para recibir los mensajes
 
-print(f"MENSAJE RECIBIDO: {mensaje.decode()}")
-mensaje=input("Ingrese su mensaje")
-conexion.send(mensaje.encode())
+def recibirMensajes():
+    while True:
+        try:
+            mensaje=conexion.recv(1024).decode()
+
+            if not mensaje:
+                break
+            print(f"MENSAJE RECIBIDO: {mensaje}")
+            
+        except:
+            break
+
+#crear el hilo para recibir los mensajes
+hilo=threading.Thread(target=recibirMensajes)
+hilo.start()
+
+#Accion para enviar los mensaje 
+while True:
+    mensaje=input("SERVIDOR: ")
+    conexion.send(mensaje.encode())
+    if mensaje.lower()=="":
+        break
+    
 
 conexion.close()
 servidor.close()
+print("Servidor cerrado...")
