@@ -11,38 +11,51 @@ puerto=5000
 
 servidor.bind((host,puerto))
 #paso 3. Activar el host
-servidor.listen(1)
+servidor.listen()
 
-#Paso 4. Aceptar las conexiones de los usuarios
-conexion,direccion=servidor.accept()
-print(f"Cliente conectado: {direccion}")
+print("SERVIDOR ACTIVO")
+print(f"{host}:{puerto}")
 
-#Funcion para recibir los mensajes
+usuarios=[]
 
-def recibirMensajes():
+#Paso extra. funcion para envio simultaneo
+def enviarTodos(mensaje,usuarioActual=None):
+    for usuario in usuarios:
+        if usuario != usuarioActual:
+            try:
+                usuario.send(mensaje.encode())
+            except:
+                usuarios.remove(usuario)
+
+#Paso extra. Funcion para obtener las conexiones
+def atender(conexion,direccion):
+    print(f"USUARIO CONECTADO: {direccion}")
+    usuarios.append(conexion) #agregamos al usuario a la lista de peticiones
+    mensaje=f"Usuario {direccion} se conecto al chat..."
+    enviarTodos(mensaje,conexion)
     while True:
         try:
             mensaje=conexion.recv(1024).decode()
-
             if not mensaje:
                 break
-            print(f"MENSAJE RECIBIDO: {mensaje}")
-            
+            print(f"{direccion}: {mensaje}")
+            if mensaje.lower()=="salir":
+                break
+            mensajeCompleto=f"Usuario {direccion}: {mensaje}"
+            enviarTodos(mensajeCompleto,conexion)
         except:
             break
-
-#crear el hilo para recibir los mensajes
-hilo=threading.Thread(target=recibirMensajes)
-hilo.start()
-
-#Accion para enviar los mensaje 
-while True:
-    mensaje=input("SERVIDOR: ")
-    conexion.send(mensaje.encode())
-    if mensaje.lower()=="":
-        break
+    if conexion in usuarios:
+        usuarios.remove(conexion)
+    conexion.close()
+    print(f"Usuario desconectado {direccion}")
     
 
-conexion.close()
-servidor.close()
-print("Servidor cerrado...")
+while True:
+    conexion,direccion=servidor.accept()
+
+    #crear el hilo para recibir los mensajes
+    hilo=threading.Thread(target=atender,args=(conexion,direccion))
+    hilo.start()
+    print(f"Usuarios conectados: {len(usuarios)}")
+    
