@@ -10,6 +10,10 @@ socket = SocketIO(app, cors_allowed_origins="*")
 # Paso 3. Crear la ruta principal
 @app.route("/")
 def inicio():
+    return render_template("login.html")
+
+@app.route("/chat")
+def chat():
     return render_template("index.html")
 
 
