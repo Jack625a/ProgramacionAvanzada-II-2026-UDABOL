@@ -1,10 +1,16 @@
 # Paso 1. Importar Flask y SocketIO
 from flask import Flask, render_template
 from flask_socketio import SocketIO, emit
+import threading
+import requests
 
 # Paso 2. Crear la aplicación y configurar SocketIO
 app = Flask(__name__)
 socket = SocketIO(app, cors_allowed_origins="*")
+
+#token telegrm
+token=""
+url=f"https://api.telegram.org/bot{token}/getUpdates"
 
 
 # Paso 3. Crear la ruta principal
@@ -26,7 +32,27 @@ def recibir_mensaje(mensaje):
     # Enviar el mensaje a TODOS los usuarios conectados
     emit("mensaje", mensaje, broadcast=True)
 
+def recibirTelegram():
+    id=0
+    while True:
+        try:
+            respuesta=requests.get(url, params={"offset":id+1,"timeout":10}).json()
+            for mensaje in respuesta["result"]:
+                id=mensaje["update_id"]
+                if "message" in mensaje:
+                    texto=mensaje["message"].get("text","")
+                    socket.emit("mensaje_telegram",{
+                        "texto":texto
+                    })
+                    print(texto)
+        except Exception as error:
+            print("Error al comunicar ",error)
+
 
 # Paso 5. Inicializar el servidor
 if __name__ == "__main__":
+
+    hilo=threading.Thread(target=recibirTelegram)
+    hilo.start()
+
     socket.run(app, host="0.0.0.0",port=5000, debug=True)
