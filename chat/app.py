@@ -3,24 +3,47 @@ from flask import Flask, render_template
 from flask_socketio import SocketIO, emit
 import threading
 import requests
+from dotenv import load_dotenv
+import os
+
+#Cargar las variables de entorno
+load_dotenv()
 
 # Paso 2. Crear la aplicación y configurar SocketIO
 app = Flask(__name__)
 socket = SocketIO(app, cors_allowed_origins="*")
 
 #token telegrm
-token=""
+token=os.getenv("tokenTelegram")
 url=f"https://api.telegram.org/bot{token}/getUpdates"
 
 
 # Paso 3. Crear la ruta principal
 @app.route("/")
 def inicio():
-    return render_template("login.html")
+    return render_template("login.html",
+        apiKey=os.getenv("apiKey"),
+        authDomain=os.getenv("authDomain"),
+        projectId=os.getenv("projectId"),
+        storageBucket= os.getenv("storageBucket"),
+        messagingSenderId= os.getenv("messagingSenderId"),
+        appId=os.getenv("appId"),
+        measurementId=os.getenv("measurementId") 
+                           
+    )
+
 
 @app.route("/chat")
 def chat():
-    return render_template("index.html")
+    return render_template("index.html",
+        apiKey=os.getenv("apiKey"),
+        authDomain=os.getenv("authDomain"),
+        projectId=os.getenv("projectId"),
+        storageBucket= os.getenv("storageBucket"),
+        messagingSenderId= os.getenv("messagingSenderId"),
+        appId=os.getenv("appId"),
+        measurementId=os.getenv("measurementId")                  
+    )
 
 
 # Paso 4. Recibir mensajes desde los clientes
