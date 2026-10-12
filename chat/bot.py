@@ -8,6 +8,24 @@ from telegram.ext import (
     ContextTypes,
     MessageHandler
 )
+from google import genai
+
+import os
+from dotenv import load_dotenv
+
+apiGoogle=os.getenv("apiGoogle")
+#Paso1. configurar gemini
+cliente=genai.Client(api_key=apiGoogle)
+modelo="gemini-3.8-flash"
+#Paso2. Configurar las funcion de informacion de conocimiento
+def cargarInformacion():
+    try: 
+        with open("informacion.txt","r",encoding="utf-8") as archivo:
+            return archivo.read()
+    except FileExistsError:
+        return ""
+
+load_dotenv()
 
 async def imagenEnviar(update:Update,context:ContextTypes.DEFAULT_TYPE):
     with open("telegram.jpg","rb") as imagen:
@@ -78,7 +96,7 @@ async def productos(update: Update, context: ContextTypes.DEFAULT_TYPE):
 if __name__ == "__main__":
 
     
-    TOKEN = ""
+    TOKEN =os.getenv("tokenTelegram")
 
     
     app = ApplicationBuilder().token(TOKEN).build()
