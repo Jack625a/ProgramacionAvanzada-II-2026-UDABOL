@@ -76,6 +76,13 @@ def enviarTelegram(texto):
     except requests.RequestException as error:
         print("Error al enviar a Telegram:", error)
 
+palabras_especificas={
+    "ayuda":"Alerta: Usuario solicita ayuda",
+    "soporte":"Alerta: Usuario solicita apoyo",
+    "imagen":"Imagen solicitada",
+    "reporte": "Reporte solicitado",
+    
+}
 
 # PASO 7. RECIBIR MENSAJES DEL CHAT WEB
 @socket.on("message")

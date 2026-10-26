@@ -16,6 +16,7 @@ from dotenv import load_dotenv
 
 
 load_dotenv()
+
 apiGoogle=os.getenv("apiGoogle")
 #Paso1. configurar gemini
 cliente=genai.Client(api_key=apiGoogle)
