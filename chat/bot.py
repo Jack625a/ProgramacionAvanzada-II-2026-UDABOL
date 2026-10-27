@@ -40,7 +40,7 @@ async def responder(update:Update,context:ContextTypes.DEFAULT_TYPE):
     if not contexto.strip():
         await update.message.reply_text("Error al activar la base de conocimiento...")
         return
-    mensajeEspera=await update.message.reply_text("Analizando...")
+    #mensajeEspera=await update.message.reply_text("Analizando...")
     pregunta=pregunta[:1000]
     try:
         indicacion=f"""
@@ -55,6 +55,7 @@ async def responder(update:Update,context:ContextTypes.DEFAULT_TYPE):
             3. Usa mensajes cortos, respondiendo los mas humano posible como un asistente de atencion al cliente
             4. recepciona y solicita datos para registro de los interesados puedes ser persuasvio
             5. No utilizar ** para el uso de negrita, usar un texto plano
+            6. Agrega empojis en tus respuestas. solo uno o dos por mensaje
 
             Pregunta del usuario: {pregunta}
         """
