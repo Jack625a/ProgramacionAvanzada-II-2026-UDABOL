@@ -81,7 +81,7 @@ palabras_especificas={
     "soporte":"Alerta: Usuario solicita apoyo",
     "imagen":"Imagen solicitada",
     "reporte": "Reporte solicitado",
-    
+
 }
 
 # PASO 7. RECIBIR MENSAJES DEL CHAT WEB
@@ -168,7 +168,8 @@ if __name__ == "__main__":
     socket.run(
         app,
         host="0.0.0.0",
-        port=5000,
+        port=int(os.getenv("PORT",5000)),
         debug=True,
-        use_reloader=False
+        use_reloader=False,
+        allow_unsafe_werkzeug=True
     )

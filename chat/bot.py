@@ -21,6 +21,9 @@ apiGoogle=os.getenv("apiGoogle")
 #Paso1. configurar gemini
 cliente=genai.Client(api_key=apiGoogle)
 modelo="gemini-3.5-flash-lite"
+
+optimizacionGemini=asyncio.Semaphore(3)
+
 #Paso2. Configurar las funcion de informacion de conocimiento
 def cargarInformacion():
     try: 
@@ -29,15 +32,16 @@ def cargarInformacion():
     except FileNotFoundError:
         return ""
 
-
+contexto=cargarInformacion() #Contexto cargado una sola vez
 
 async def responder(update:Update,context:ContextTypes.DEFAULT_TYPE):
     pregunta=update.message.text
-    contexto=cargarInformacion()
+    #contexto=cargarInformacion()
     if not contexto.strip():
         await update.message.reply_text("Error al activar la base de conocimiento...")
         return
     mensajeEspera=await update.message.reply_text("Analizando...")
+    pregunta=pregunta[:1000]
     try:
         indicacion=f"""
             Debes responder de forma cordial las consultas de los usuarios
@@ -50,17 +54,19 @@ async def responder(update:Update,context:ContextTypes.DEFAULT_TYPE):
             pero sin salir del tema especifico para tu busqueda
             3. Usa mensajes cortos, respondiendo los mas humano posible como un asistente de atencion al cliente
             4. recepciona y solicita datos para registro de los interesados puedes ser persuasvio
+            5. No utilizar ** para el uso de negrita, usar un texto plano
 
-            Pregunta de la persona: {pregunta}
+            Pregunta del usuario: {pregunta}
         """
-        respuesta=await asyncio.to_thread(
-            cliente.models.generate_content,
-                model=modelo,
-                contents=indicacion
-        )
-        texto=respuesta.text or ("Error al procesar")
-        for inicio in range(0,len(texto),2000):
-            await update.message.reply_text(texto[inicio:inicio+2000])
+        async with optimizacionGemini:      
+            respuesta=await asyncio.to_thread(
+                cliente.models.generate_content,
+                    model=modelo,
+                    contents=indicacion
+            )
+            texto=respuesta.text or ("Error al procesar")
+            for inicio in range(0,len(texto),2000):
+                await update.message.reply_text(texto[inicio:inicio+2000])
     except Exception as error:
         print("Error al conectar",error)
 
